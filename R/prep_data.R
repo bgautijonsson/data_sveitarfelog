@@ -73,7 +73,7 @@ efnahagur <- read_excel("data-raw/Efnahagsreikningar 2023.xlsx", skip = 4) |>
       "Eigið fé"
     ) | tegund %in% c(
       "Skammtímakröfur á eigin fyrirtæki",
-      "Aðrirr veltufjármunir",
+      "Aðrir veltufjármunir",
       "Handbært fé"
     )
   ) |> 
