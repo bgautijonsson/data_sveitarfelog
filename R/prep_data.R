@@ -39,7 +39,8 @@ rekstur <- read_excel("data-raw/Rekstrarreikningar 2023.xlsx", skip = 5) |>
       "Framlag úr Jöfnunarsjóði", 
       "Útsvar",
       "Fasteignaskattur",
-      "Laun og launatengd gjöld"
+      "Laun og launatengd gjöld",
+      "(Fjármagnsgjöld)"
     )
   ) |> 
   mutate(
@@ -182,6 +183,7 @@ d <- d |>
     gjold = "Gjöld",
     afskriftir = "Afskriftir",
     fjarmagnslidir = "Fjármagnsliðir",
+    fjarmagnsgjold = "(Fjármagnsgjöld)",
     oreglulegir_lidir = "Óreglulegir",
     rekstrarnidurstada = "Rekstrarniðurstaða",
     afborganir_langtimalana = "Afborganir langtímalána",
@@ -236,6 +238,7 @@ d <- d |>
     fjarf_nylan = tekin_ny_langtimalan - ny_fjarfesting,
     fjarfesting_hlutf_skuldir = fjarf_nylan / heildarskuldir,
     fjarmagnslidir_a_ibua = fjarmagnslidir / mannfjoldi,
+    fjarmagnsgjold_a_ibua = fjarmagnsgjold / mannfjoldi,
     framlegd = tekjur - gjold + afskriftir,
     framlegd_hlutf = framlegd / tekjur,
     gjold_a_ibua = gjold / mannfjoldi,
@@ -292,6 +295,7 @@ throun_data <- d |>
     "Heildarskuldir" = heildarskuldir,
     "Eiginfjárhlutfall" = eiginfjarhlutfall,
     "Fjármagnsliðir á íbúa" = fjarmagnslidir_a_ibua,
+    "Fjármagnsgjöld á íbúa" = fjarmagnsgjold_a_ibua,
     "Framlag jöfnunarsjóðs á íbúa" = jofnunarsjodur_a_ibua,
     "Framlegð sem hlutfall af tekjum" = framlegd_hlutf,
     "Handbært fé á íbúa" = handbaert_fe_per_ibui,
@@ -351,6 +355,7 @@ dreifing_data <- d |>
     "Eiginfjárhlutfall" = eiginfjarhlutfall,
     "Framlegð sem hlutfall af tekjum" = framlegd_hlutf,
     "Handbært fé á íbúa" = handbaert_fe_per_ibui,
+    "Fjármagnsgjöld á íbúa" = fjarmagnsgjold_a_ibua,
     "Launa- og launatengd gjöld á íbúa" = launagjold_per_ibui,
     "Launa- og launatengd gjöld sem hlutfall af gjöldum" = launagjold_hlutf_gjold,
     "Nettóskuldir sem hlutfall af tekjum" = nettoskuldir_hlutf_tekjur,
