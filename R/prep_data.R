@@ -32,6 +32,11 @@ rekstur <- read_excel("data-raw/Rekstrarreikningar 2023.xlsx", skip = 5) |>
       tegund2 == "Fjármagsliðir Total",
       "Fjármagnsliðir Total",
       tegund2
+    ),
+    tegund = if_else(
+      tegund %in% c("Útsvar", "Fasteignaskattur", "Skattaígildi (lóðaleiga)"),
+      "Skatttekjur án Jöfnunarsjóðs",
+      tegund
     )
   ) |> 
   filter(
@@ -47,6 +52,7 @@ rekstur <- read_excel("data-raw/Rekstrarreikningar 2023.xlsx", skip = 5) |>
       "Útsvar",
       "Fasteignaskattur",
       "Laun og launatengd gjöld",
+      "Skatttekjur án Jöfnunarsjóðs",
       "(Fjármagnsgjöld)"
     )
   ) |> 
@@ -59,6 +65,10 @@ rekstur <- read_excel("data-raw/Rekstrarreikningar 2023.xlsx", skip = 5) |>
     ar = parse_number(ar),
     sveitarfelag = str_sub(sveitarfelag, start = 6),
     total = coalesce(total, 0)
+  ) |> 
+  summarise(
+    total = sum(total),
+    .by = c(ar, sveitarfelag, hluti, tegund2)
   )
 
 
@@ -184,8 +194,9 @@ d <- d |>
     eignir,
     langtimaskuldir = "Langtímaskuldir",
     tekjur = "Tekjur",
-    utsvar = "Útsvar",
-    fasteignaskattur = "Fasteignaskattur",
+    # utsvar = "Útsvar",
+    # fasteignaskattur = "Fasteignaskattur",
+    skatttekjur_an_jofnundarsjods = "Skatttekjur án Jöfnunarsjóðs",
     framlag_jofnunarsjods = "Framlag úr Jöfnunarsjóði",
     gjold = "Gjöld",
     afskriftir = "Afskriftir",
@@ -261,8 +272,9 @@ d <- d |>
     rekstur_3_ar = rekstrarnidurstada + lag(rekstrarnidurstada, 1) + lag(rekstrarnidurstada, 2),
     tekjur_3_ar = tekjur + lag(tekjur, 1) + lag(tekjur, 2),
     rekstur_3_ar_hlutf_tekjur = rekstur_3_ar / tekjur_3_ar,
-    utsvar_a_ibua = utsvar / mannfjoldi,
-    fasteignaskattur_a_ibua = fasteignaskattur / mannfjoldi,
+    # utsvar_a_ibua = utsvar / mannfjoldi,
+    # fasteignaskattur_a_ibua = fasteignaskattur / mannfjoldi,
+    skattur_a_ibua = skatttekjur_an_jofnundarsjods / mannfjoldi,
     skuldahlutfall = 1 - eiginfjarhlutfall,
     skuldir_hlutf_tekjur = heildarskuldir / tekjur,
     skuldir_per_ibui = heildarskuldir / mannfjoldi,
@@ -312,8 +324,9 @@ throun_data <- d |>
     "Rekstrarniðurstaða á íbúa" = rekstrarnidurstada_a_ibua,
     "Rekstrarniðurstaða sem hlutfall af tekjum" = rekstrarnidurstada_hlutf,
     "Rekstrarniðurstaða undanfarinna 3 ára sem hlutfall af tekjum" = rekstur_3_ar_hlutf_tekjur,
-    "Útsvar á íbúa" = utsvar_a_ibua,
-    "Fasteignaskattur á íbúa" = fasteignaskattur_a_ibua,
+    # "Útsvar á íbúa" = utsvar_a_ibua,
+    # "Fasteignaskattur á íbúa" = fasteignaskattur_a_ibua,
+    "Útsvar og fasteignaskattur á íbúa" = skattur_a_ibua,
     "Skuldir sem hlutfall af tekjum" = skuldir_hlutf_tekjur,
     "Skuldir á íbúa" = skuldir_per_ibui,
     "Tekjur á íbúa" = tekjur_a_ibua,
@@ -367,8 +380,9 @@ dreifing_data <- d |>
     "Nettóskuldir sem hlutfall af tekjum" = nettoskuldir_hlutf_tekjur,
     "Rekstrarniðurstaða sem hlutfall af tekjum" = rekstrarnidurstada_hlutf,
     "Rekstrarniðurstaða undanfarinna 3 ára sem hlutfall af tekjum" = rekstur_3_ar_hlutf_tekjur,
-    "Útsvar á íbúa" =  utsvar_a_ibua,
-    "Fasteignaskattur á íbúa" =  fasteignaskattur_a_ibua,
+    # "Útsvar á íbúa" =  utsvar_a_ibua,
+    # "Fasteignaskattur á íbúa" =  fasteignaskattur_a_ibua,
+    "Útsvar og fasteignaskattur á íbúa" = skattur_a_ibua,
     "Skuldir sem hlutfall af tekjum" = skuldir_hlutf_tekjur,
     "Skuldir á íbúa" = skuldir_per_ibui,
     "Veltufé frá rekstri sem hlutfall af tekjum" = veltufe_hlutf_tekjur,
