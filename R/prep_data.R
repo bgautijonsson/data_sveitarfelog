@@ -8,18 +8,18 @@ library(googlesheets4)
 
 #### Mannfjöldi ####
 
-url <- "https://px.hagstofa.is:443/pxis/api/v1/is/Ibuar/mannfjoldi/2_byggdir/sveitarfelog/MAN02005.px"
-mannfjoldi <- hg_data(url) |> 
-  filter(
-    Aldur == "Alls",
-    Kyn == "Alls",
-    Sveitarfélag != "Alls"
-  ) |> 
-  collect() |> 
-  clean_names() |> 
-  rename(mannfjoldi = 5) |> 
-  select(-aldur, -kyn) |> 
-  mutate(ar = parse_number(ar))
+# url <- "https://px.hagstofa.is:443/pxis/api/v1/is/Ibuar/mannfjoldi/2_byggdir/sveitarfelog/MAN02005.px"
+# mannfjoldi <- hg_data(url) |> 
+#   filter(
+#     Aldur == "Alls",
+#     Kyn == "Alls",
+#     Sveitarfélag != "Alls"
+#   ) |> 
+#   collect() |> 
+#   clean_names() |> 
+#   rename(mannfjoldi = 5) |> 
+#   select(-aldur, -kyn) |> 
+#   mutate(ar = parse_number(ar))
 
 #### SÍS Gögn ####
 
@@ -66,7 +66,7 @@ efnahagur <- read_excel("data-raw/Efnahagsreikningar 2023.xlsx", skip = 4) |>
     tegund2 %in% c(
       "Veltufjármunir Total", 
       "Varanlegir rekstrarfjármunir", 
-      "Áhættufjármunir og langtímakröfur",
+      "Áhættufjármunir og langtímakröfur Total",
       "Skuldbindingar", 
       "Langtímaskuldir",
       "Skammtímaskuldir", 
@@ -74,7 +74,9 @@ efnahagur <- read_excel("data-raw/Efnahagsreikningar 2023.xlsx", skip = 4) |>
     ) | tegund %in% c(
       "Skammtímakröfur á eigin fyrirtæki",
       "Aðrir veltufjármunir",
-      "Handbært fé"
+      "Handbært fé",
+      "Langtímakröfur á eigin fyrirtæki",
+      "Langtímakröfur"
     )
   ) |> 
   mutate(
@@ -194,13 +196,16 @@ d <- d |>
     fjarfestingarhreyfingar = "Fjárfestingarhreyfingar",
     nyjar_langtimaskuldir = "Tekin ný langtímalán",
     launagjold = "Laun og launatengd gjöld",
-    veltufe = "Veltufé frá rekstri"
+    veltufe = "Veltufé frá rekstri",
+    ahaettufjarmunir_og_langtimakrofur = "Áhættufjármunir og langtímakröfur",
+    langtimakrofur_a_eigin_fyrirtaeki = "Langtímakröfur á eigin fyrirtæki",
+    langtimakrofur = "Langtímakröfur"
   )
 
 d <- d |>
   group_by(sveitarfelag, ar, hluti) |>
   summarise_at(
-    vars(heildarskuldir:veltufe),
+    vars(everything()),
     ~ 1000 * sum(.x)
   ) |>
   ungroup()
@@ -214,8 +219,8 @@ d <- d |>
     )
   )
 
-d_2024 <- read_sheet("https://docs.google.com/spreadsheets/d/1SU7wVG_H38G5uzhdUc8mpOvwIW6aAj7PKYnmUB7IwgM/edit#gid=0") |>
-  mutate_at(vars(-ar, -sveitarfelag, -hluti), \(x) x * 1000)
+# d_2024 <- read_sheet("https://docs.google.com/spreadsheets/d/1SU7wVG_H38G5uzhdUc8mpOvwIW6aAj7PKYnmUB7IwgM/edit#gid=0") |>
+#   mutate_at(vars(-ar, -sveitarfelag, -hluti), \(x) x * 1000)
 
 
 d <- d |>
@@ -239,7 +244,7 @@ d <- d |>
     jofnunarsjodur_a_ibua = framlag_jofnunarsjods / mannfjoldi,
     launagjold_per_ibui = launagjold / mannfjoldi,
     launagjold_hlutf_gjold = launagjold / gjold,
-    nettoskuldir = heildarskuldir - veltufjarmunir + skammtimakrofur_eigin_fyrirtaeki,
+    nettoskuldir = heildarskuldir - veltufjarmunir + skammtimakrofur_eigin_fyrirtaeki - langtimakrofur,
     nettoskuldir_hlutf_tekjur = nettoskuldir / tekjur,
     rekstrarnidurstada_hlutf = rekstrarnidurstada / tekjur,
     rekstrarnidurstada_a_ibua = rekstrarnidurstada / mannfjoldi,
