@@ -8,18 +8,18 @@ library(googlesheets4)
 
 #### Mannfjöldi ####
 
-# url <- "https://px.hagstofa.is:443/pxis/api/v1/is/Ibuar/mannfjoldi/2_byggdir/sveitarfelog/MAN02005.px"
-# mannfjoldi <- hg_data(url) |> 
-#   filter(
-#     Aldur == "Alls",
-#     Kyn == "Alls",
-#     Sveitarfélag != "Alls"
-#   ) |> 
-#   collect() |> 
-#   clean_names() |> 
-#   rename(mannfjoldi = 5) |> 
-#   select(-aldur, -kyn) |> 
-#   mutate(ar = parse_number(ar))
+url <- "https://px.hagstofa.is:443/pxis/api/v1/is/Ibuar/mannfjoldi/2_byggdir/sveitarfelog/MAN02005.px"
+mannfjoldi <- hg_data(url) |>
+  filter(
+    Aldur == "Alls",
+    Kyn == "Alls",
+    Sveitarfélag != "Alls"
+  ) |>
+  collect() |>
+  clean_names() |>
+  rename(mannfjoldi = 5) |>
+  select(-aldur, -kyn) |>
+  mutate(ar = parse_number(ar))
 
 #### SÍS Gögn ####
 
@@ -219,8 +219,8 @@ d <- d |>
     )
   )
 
-# d_2024 <- read_sheet("https://docs.google.com/spreadsheets/d/1SU7wVG_H38G5uzhdUc8mpOvwIW6aAj7PKYnmUB7IwgM/edit#gid=0") |>
-#   mutate_at(vars(-ar, -sveitarfelag, -hluti), \(x) x * 1000)
+d_2024 <- read_sheet("https://docs.google.com/spreadsheets/d/1SU7wVG_H38G5uzhdUc8mpOvwIW6aAj7PKYnmUB7IwgM/edit#gid=0") |>
+  mutate_at(vars(-ar, -sveitarfelag, -hluti), \(x) x * 1000)
 
 
 d <- d |>
