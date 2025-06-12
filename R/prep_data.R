@@ -27,6 +27,13 @@ mannfjoldi <- hg_data(url) |>
 rekstur <- read_excel("data-raw/Rekstrarreikningar 2023.xlsx", skip = 5) |> 
   clean_names() |> 
   fill(ar, sveitarfelag, hluti) |> 
+  mutate(
+    tegund2 = if_else(
+      tegund2 == "Fjármagsliðir Total",
+      "Fjármagnsliðir Total",
+      tegund2
+    )
+  ) |> 
   filter(
     tegund2 %in% c(
       "Gjöld Total", 
@@ -295,7 +302,6 @@ throun_data <- d |>
     "Heildarskuldir" = heildarskuldir,
     "Eiginfjárhlutfall" = eiginfjarhlutfall,
     "Fjármagnsliðir á íbúa" = fjarmagnslidir_a_ibua,
-    "Fjármagnsgjöld á íbúa" = fjarmagnsgjold_a_ibua,
     "Framlag jöfnunarsjóðs á íbúa" = jofnunarsjodur_a_ibua,
     "Framlegð sem hlutfall af tekjum" = framlegd_hlutf,
     "Handbært fé á íbúa" = handbaert_fe_per_ibui,
@@ -355,7 +361,7 @@ dreifing_data <- d |>
     "Eiginfjárhlutfall" = eiginfjarhlutfall,
     "Framlegð sem hlutfall af tekjum" = framlegd_hlutf,
     "Handbært fé á íbúa" = handbaert_fe_per_ibui,
-    "Fjármagnsgjöld á íbúa" = fjarmagnsgjold_a_ibua,
+    "Fjármagnsliðir á íbúa" = fjarmagnslidir_a_ibua,
     "Launa- og launatengd gjöld á íbúa" = launagjold_per_ibui,
     "Launa- og launatengd gjöld sem hlutfall af gjöldum" = launagjold_hlutf_gjold,
     "Nettóskuldir sem hlutfall af tekjum" = nettoskuldir_hlutf_tekjur,
